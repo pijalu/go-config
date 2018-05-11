@@ -15,7 +15,7 @@ type Source interface {
 
 // ChangeSet represents a set of changes from a source
 type ChangeSet struct {
-	Data      []byte
+	Data      map[string]interface{}
 	Checksum  string
 	Timestamp time.Time
 	Source    string
