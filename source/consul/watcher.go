@@ -1,14 +1,13 @@
 package consul
 
 import (
-	"crypto/md5"
-	"encoding/json"
 	"errors"
-	"fmt"
+	"log"
 
 	"github.com/hashicorp/consul/api"
 	"github.com/hashicorp/consul/watch"
-	"github.com/micro/go-config/source"
+	"github.com/pijalu/go-config/changeset"
+	"github.com/pijalu/go-config/source"
 )
 
 type watcher struct {
@@ -16,7 +15,7 @@ type watcher struct {
 	stripPrefix string
 
 	wp   *watch.Plan
-	ch   chan *source.ChangeSet
+	ch   chan *changeset.ChangeSet
 	exit chan bool
 }
 
@@ -24,7 +23,7 @@ func newWatcher(key, addr, name string, stripPrefix string) (source.Watcher, err
 	w := &watcher{
 		name:        name,
 		stripPrefix: stripPrefix,
-		ch:          make(chan *source.ChangeSet),
+		ch:          make(chan *changeset.ChangeSet),
 		exit:        make(chan bool),
 	}
 
@@ -53,25 +52,15 @@ func (w *watcher) handle(idx uint64, data interface{}) {
 		return
 	}
 
-	d := makeMap(kvs, w.stripPrefix)
-
-	b, err := json.Marshal(d)
+	cs, err := prs.Parse(sourceName, makeMap(kvs, w.stripPrefix))
 	if err != nil {
-		return
+		log.Printf("error during parse: %v", err)
 	}
 
-	h := md5.New()
-	h.Write(b)
-	checksum := fmt.Sprintf("%x", h.Sum(nil))
-
-	w.ch <- &source.ChangeSet{
-		Source:   w.name,
-		Data:     b,
-		Checksum: checksum,
-	}
+	w.ch <- cs
 }
 
-func (w *watcher) Next() (*source.ChangeSet, error) {
+func (w *watcher) Next() (*changeset.ChangeSet, error) {
 	select {
 	case cs := <-w.ch:
 		return cs, nil

@@ -7,12 +7,18 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/pijalu/go-config/changeset"
+	"github.com/pijalu/go-config/parser"
 	"github.com/pijalu/go-config/parser/noop"
-	"github.com/pijalu/go-config/source"
 )
 
 // Parser object
 type Parser struct{}
+
+// NewParser return a json parser
+func NewParser() parser.Parser {
+	return &Parser{}
+}
 
 // Parse a json data struct
 func (m *Parser) parseJSON(data interface{}) (map[string]interface{}, error) {
@@ -38,7 +44,7 @@ func (m *Parser) parseJSON(data interface{}) (map[string]interface{}, error) {
 }
 
 // Parse parses data, expected to be []bytes and return a matching changeset
-func (m *Parser) Parse(src string, data interface{}) (*source.ChangeSet, error) {
+func (m *Parser) Parse(src string, data interface{}) (*changeset.ChangeSet, error) {
 	jsonData, err := m.parseJSON(data)
 	if err != nil {
 		return nil, err

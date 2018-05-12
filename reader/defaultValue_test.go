@@ -5,12 +5,46 @@ import (
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/pijalu/go-config/changeset"
 )
 
 type structWithStringer struct{}
 
 func (t structWithStringer) String() string {
 	return "ts"
+}
+
+func TestMap(t *testing.T) {
+	expected := map[string]interface{}{"key": "value"}
+	actual := NewValues(&changeset.ChangeSet{
+		Data: expected,
+	}).Map()
+
+	if !reflect.DeepEqual(actual, expected) {
+		t.Fatalf("expected %v but got %v",
+			expected,
+			actual)
+	}
+}
+
+func TestGet(t *testing.T) {
+	expected := "value"
+
+	vs := NewValues(&changeset.ChangeSet{
+		Data: map[string]interface{}{
+			"k1": map[string]interface{}{
+				"k2": expected,
+			},
+		},
+	})
+
+	actual := vs.Get("k1", "k2").String("nope")
+	if actual != expected {
+		t.Fatalf("expected %v but got %v",
+			expected,
+			actual)
+	}
 }
 
 func TestAsString(t *testing.T) {

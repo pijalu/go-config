@@ -4,7 +4,8 @@ import (
 	"errors"
 
 	"github.com/fsnotify/fsnotify"
-	"github.com/micro/go-config/source"
+	"github.com/pijalu/go-config/changeset"
+	"github.com/pijalu/go-config/source"
 )
 
 type watcher struct {
@@ -29,7 +30,7 @@ func newWatcher(f *file) (source.Watcher, error) {
 	}, nil
 }
 
-func (w *watcher) Next() (*source.ChangeSet, error) {
+func (w *watcher) Next() (*changeset.ChangeSet, error) {
 	// is it closed?
 	select {
 	case <-w.exit:

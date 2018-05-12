@@ -1,13 +1,14 @@
 package consul
 
 import (
-	"crypto/md5"
-	"encoding/json"
 	"fmt"
 	"net"
 
 	"github.com/hashicorp/consul/api"
-	"github.com/micro/go-config/source"
+	"github.com/pijalu/go-config/changeset"
+	"github.com/pijalu/go-config/parser"
+	"github.com/pijalu/go-config/parser/noop"
+	"github.com/pijalu/go-config/source"
 )
 
 // Currently a single consul reader
@@ -19,11 +20,19 @@ type consul struct {
 	client      *api.Client
 }
 
+const sourceName = "consul"
+
 var (
 	DefaultPrefix = "/micro/config/"
 )
 
-func (c *consul) Read() (*source.ChangeSet, error) {
+var prs parser.Parser
+
+func init() {
+	prs = noop.NewParser()
+}
+
+func (c *consul) Load() (interface{}, error) {
 	kv, _, err := c.client.KV().List(c.prefix, nil)
 	if err != nil {
 		return nil, err
@@ -33,26 +42,19 @@ func (c *consul) Read() (*source.ChangeSet, error) {
 		return nil, fmt.Errorf("source not found: %s", c.prefix)
 	}
 
-	data := makeMap(kv, c.stripPrefix)
+	return makeMap(kv, c.stripPrefix), nil
+}
 
-	b, err := json.Marshal(data)
+func (c *consul) Read() (*changeset.ChangeSet, error) {
+	data, err := c.Load()
 	if err != nil {
-		return nil, fmt.Errorf("error reading source: %v", err)
+		return nil, fmt.Errorf("Failed to read: %v", err)
 	}
-
-	// hash the consul
-	h := md5.New()
-	h.Write(b)
-
-	return &source.ChangeSet{
-		Source:   c.String(),
-		Data:     b,
-		Checksum: fmt.Sprintf("%x", h.Sum(nil)),
-	}, nil
+	return prs.Parse(sourceName, data)
 }
 
 func (c *consul) String() string {
-	return "consul"
+	return sourceName
 }
 
 func (c *consul) Watch() (source.Watcher, error) {

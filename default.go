@@ -9,9 +9,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/micro/go-config/reader"
-	"github.com/micro/go-config/reader/json"
-	"github.com/micro/go-config/source"
+	"github.com/pijalu/go-config/reader"
+	"github.com/pijalu/go-config/reader/json"
+	"github.com/pijalu/go-config/source"
 )
 
 type config struct {
@@ -20,11 +20,11 @@ type config struct {
 
 	sync.RWMutex
 	// the current merged set
-	set *source.ChangeSet
+	set *changeset.ChangeSet
 	// the current values
 	vals reader.Values
 	// all the sets
-	sets []*source.ChangeSet
+	sets []*changeset.ChangeSet
 	// all the sources
 	sources []source.Source
 
@@ -63,7 +63,7 @@ func newConfig(opts ...Option) Config {
 
 func (c *config) watch(idx int, s source.Source) {
 	c.Lock()
-	c.sets = append(c.sets, &source.ChangeSet{Source: s.String()})
+	c.sets = append(c.sets, &changeset.ChangeSet{Source: s.String()})
 	c.Unlock()
 
 	// watches a source for changes
@@ -163,7 +163,7 @@ func (c *config) update() {
 
 // sync loads all the sources, calls the parser and updates the config
 func (c *config) sync() {
-	var sets []*source.ChangeSet
+	var sets []*changeset.ChangeSet
 
 	c.Lock()
 
@@ -246,7 +246,7 @@ func (c *config) Get(path ...string) reader.Value {
 		// Let's try hack this
 		// We should really be better
 		if ch == nil || ch.Data == nil {
-			ch = &source.ChangeSet{
+			ch = &changeset.ChangeSet{
 				Timestamp: time.Now(),
 				Source:    "config",
 				Data:      []byte(`{}`),

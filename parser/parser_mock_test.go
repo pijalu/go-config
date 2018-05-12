@@ -1,6 +1,6 @@
 package parser
 
-import "github.com/pijalu/go-config/source"
+import "github.com/pijalu/go-config/changeset"
 
 // Store actual call to parserz
 type MockParserCall struct {
@@ -10,12 +10,12 @@ type MockParserCall struct {
 
 // MockParser is a mocked parsers
 type MockParser struct {
-	ParseCalls []MockParserCall  // ParseCalls saves the call lists
-	RError     error             // RError defines returned errors
-	RChangeSet *source.ChangeSet // RChangeSet defines the returned changeset
+	ParseCalls []MockParserCall     // ParseCalls saves the call lists
+	RError     error                // RError defines returned errors
+	RChangeSet *changeset.ChangeSet // RChangeSet defines the returned changeset
 }
 
-func (m *MockParser) Parse(source string, i interface{}) (*source.ChangeSet, error) {
+func (m *MockParser) Parse(source string, i interface{}) (*changeset.ChangeSet, error) {
 	m.ParseCalls = append(m.ParseCalls, MockParserCall{
 		Source: source,
 		Data:   i,

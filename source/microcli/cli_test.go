@@ -3,7 +3,7 @@ package microcli
 import (
 	"encoding/json"
 	"github.com/micro/cli"
-	"github.com/micro/go-config/source"
+	"github.com/pijalu/go-config/source"
 	"testing"
 )
 

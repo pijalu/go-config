@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/imdario/mergo"
 	"github.com/micro/cli"
-	"github.com/micro/go-config/source"
+	"github.com/pijalu/go-config/source"
 	"strings"
 	"time"
 )
@@ -16,7 +16,7 @@ type clisrc struct {
 	ctx  *cli.Context
 }
 
-func (c *clisrc) Read() (*source.ChangeSet, error) {
+func (c *clisrc) Read() (*changeset.ChangeSet, error) {
 	var changes map[string]interface{}
 
 	for _, name := range c.ctx.GlobalFlagNames() {
@@ -38,7 +38,7 @@ func (c *clisrc) Read() (*source.ChangeSet, error) {
 	h.Write(b)
 	checksum := fmt.Sprintf("%x", h.Sum(nil))
 
-	return &source.ChangeSet{
+	return &changeset.ChangeSet{
 		Data:      b,
 		Checksum:  checksum,
 		Timestamp: time.Now(),
