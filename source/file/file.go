@@ -12,6 +12,8 @@ import (
 	"github.com/pijalu/go-config/changeset"
 	"github.com/pijalu/go-config/parser"
 	"github.com/pijalu/go-config/parser/json"
+	"github.com/pijalu/go-config/parser/xml"
+	"github.com/pijalu/go-config/parser/yaml"
 	"github.com/pijalu/go-config/source"
 )
 
@@ -29,6 +31,8 @@ var parsers = make(map[string]parser.Parser)
 
 func init() {
 	parsers["json"] = json.NewParser()
+	parsers["yaml"] = yaml.NewParser()
+	parsers["xml"] = xml.NewParser()
 }
 
 func (f *file) Load() (interface{}, error) {
