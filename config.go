@@ -4,14 +4,13 @@ package config
 import (
 	"context"
 
-	"github.com/micro/go-config/reader"
-	"github.com/micro/go-config/source"
+	"github.com/pijalu/go-config/reader"
+	"github.com/pijalu/go-config/source"
 )
 
 // Config is an interface abstraction for dynamic configuration
 type Config interface {
 	Close() error
-	Bytes() []byte
 	Get(path ...string) reader.Value
 	Load(source ...source.Source) error
 	Watch(path ...string) (Watcher, error)

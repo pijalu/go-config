@@ -2,24 +2,27 @@
 package memory
 
 import (
-	"crypto/md5"
-	"fmt"
 	"sync"
 	"time"
 
-	"github.com/micro/go-config/source"
 	"github.com/pborman/uuid"
+	"github.com/pijalu/go-config/changeset"
+	"github.com/pijalu/go-config/source"
 )
 
 type memory struct {
 	sync.RWMutex
-	ChangeSet *source.ChangeSet
+	ChangeSet *changeset.ChangeSet
 	Watchers  map[string]*watcher
 }
 
-func (s *memory) Read() (*source.ChangeSet, error) {
+func (s *memory) Load() (interface{}, error) {
+	return s.ChangeSet.Data, nil
+}
+
+func (s *memory) Read() (*changeset.ChangeSet, error) {
 	s.RLock()
-	cs := &source.ChangeSet{
+	cs := &changeset.ChangeSet{
 		Timestamp: s.ChangeSet.Timestamp,
 		Data:      s.ChangeSet.Data,
 		Checksum:  s.ChangeSet.Checksum,
@@ -32,7 +35,7 @@ func (s *memory) Read() (*source.ChangeSet, error) {
 func (s *memory) Watch() (source.Watcher, error) {
 	w := &watcher{
 		Id:      uuid.NewUUID().String(),
-		Updates: make(chan *source.ChangeSet, 100),
+		Updates: make(chan *changeset.ChangeSet, 100),
 		Source:  s,
 	}
 
@@ -43,20 +46,14 @@ func (s *memory) Watch() (source.Watcher, error) {
 }
 
 // Update allows manual updates of the config data.
-func (s *memory) Update(data []byte) {
-	// hash the file
-	h := md5.New()
-	h.Write(data)
-	checksum := fmt.Sprintf("%x", h.Sum(nil))
-
+func (s *memory) Update(data map[string]interface{}) {
 	s.Lock()
 	// update changeset
-	s.ChangeSet = &source.ChangeSet{
+	s.ChangeSet = (&changeset.ChangeSet{
 		Timestamp: time.Now(),
 		Data:      data,
-		Checksum:  checksum,
 		Source:    "memory",
-	}
+	}).RecalculateChecksum()
 
 	// update watchers
 	for _, w := range s.Watchers {
@@ -78,10 +75,10 @@ func NewSource(opts ...source.Option) source.Source {
 		o(&options)
 	}
 
-	var data []byte
+	var data map[string]interface{}
 
 	if options.Context != nil {
-		d, ok := options.Context.Value(dataKey{}).([]byte)
+		d, ok := options.Context.Value(dataKey{}).(map[string]interface{})
 		if ok {
 			data = d
 		}

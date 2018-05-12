@@ -1,14 +1,15 @@
 package microcli
 
 import (
-	"crypto/md5"
-	"encoding/json"
 	"fmt"
+	"strings"
+
 	"github.com/imdario/mergo"
 	"github.com/micro/cli"
-	"github.com/micro/go-config/source"
-	"strings"
-	"time"
+	"github.com/pijalu/go-config/changeset"
+	"github.com/pijalu/go-config/parser"
+	"github.com/pijalu/go-config/parser/noop"
+	"github.com/pijalu/go-config/source"
 )
 
 type clisrc struct {
@@ -16,7 +17,15 @@ type clisrc struct {
 	ctx  *cli.Context
 }
 
-func (c *clisrc) Read() (*source.ChangeSet, error) {
+const sourceName = "microcli"
+
+var prs parser.Parser
+
+func init() {
+	prs = noop.NewParser()
+}
+
+func (c *clisrc) Load() (interface{}, error) {
 	var changes map[string]interface{}
 
 	for _, name := range c.ctx.GlobalFlagNames() {
@@ -28,22 +37,15 @@ func (c *clisrc) Read() (*source.ChangeSet, error) {
 		tmp := toEntry(name, c.ctx.Generic(name))
 		mergo.Map(&changes, tmp) // need to sort error handling
 	}
+	return changes, nil
+}
 
-	b, err := json.Marshal(changes)
+func (c *clisrc) Read() (*changeset.ChangeSet, error) {
+	data, err := c.Load()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Failed to read: %v", err)
 	}
-
-	h := md5.New()
-	h.Write(b)
-	checksum := fmt.Sprintf("%x", h.Sum(nil))
-
-	return &source.ChangeSet{
-		Data:      b,
-		Checksum:  checksum,
-		Timestamp: time.Now(),
-		Source:    c.String(),
-	}, nil
+	return prs.Parse(sourceName, data)
 }
 
 func toEntry(name string, v interface{}) map[string]interface{} {
@@ -54,10 +56,9 @@ func toEntry(name string, v interface{}) map[string]interface{} {
 	for i, k := range keys {
 		if i == 0 {
 			tmp[k] = v
-			continue
+		} else {
+			tmp = map[string]interface{}{k: tmp}
 		}
-
-		tmp = map[string]interface{}{k: tmp}
 	}
 	return tmp
 }
@@ -78,7 +79,7 @@ func (c *clisrc) Watch() (source.Watcher, error) {
 }
 
 func (c *clisrc) String() string {
-	return "microcli"
+	return sourceName
 }
 
 // NewSource returns a config source for integrating parsed flags from a micro/cli.Context.

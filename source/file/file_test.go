@@ -4,13 +4,15 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"reflect"
 	"testing"
 	"time"
 )
 
 func TestFile(t *testing.T) {
 	data := []byte(`{"foo": "bar"}`)
-	path := filepath.Join(os.TempDir(), fmt.Sprintf("file.%d", time.Now().UnixNano()))
+	expected := map[string]interface{}{"foo": "bar"}
+	path := filepath.Join(os.TempDir(), fmt.Sprintf("file.%d.json", time.Now().UnixNano()))
 	fh, err := os.Create(path)
 	if err != nil {
 		t.Error(err)
@@ -30,8 +32,10 @@ func TestFile(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	t.Logf("%+v", c)
-	if string(c.Data) != string(data) {
-		t.Error("data from file does not match")
+	//	t.Logf("%+v", c)
+	if !reflect.DeepEqual(c.Data, expected) {
+		t.Errorf("expected %v but got %v",
+			expected,
+			c.Data)
 	}
 }

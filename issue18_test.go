@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/micro/go-config/source/envvar"
-	"github.com/micro/go-config/source/file"
+	"github.com/pijalu/go-config/source/envvar"
+	"github.com/pijalu/go-config/source/file"
 )
 
 func createFileForIssue18(t *testing.T, content string) *os.File {
@@ -27,6 +27,7 @@ func createFileForIssue18(t *testing.T, content string) *os.File {
 }
 
 func TestIssue18(t *testing.T) {
+	t.Skip("Waiting for fix upstream")
 	fh := createFileForIssue18(t, `{
   "amqp": {
     "host": "rabbit.platform",

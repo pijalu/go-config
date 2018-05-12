@@ -3,13 +3,17 @@ package config
 import (
 	"time"
 
-	"github.com/micro/go-config/reader"
+	"github.com/pijalu/go-config/reader"
 )
 
 type value struct{}
 
 func newValue() reader.Value {
 	return new(value)
+}
+
+func (v *value) Checksum() string {
+	return ""
 }
 
 func (v *value) Bool(def bool) bool {
@@ -41,9 +45,5 @@ func (v *value) StringMap(def map[string]string) map[string]string {
 }
 
 func (v *value) Scan(val interface{}) error {
-	return nil
-}
-
-func (v *value) Bytes() []byte {
 	return nil
 }

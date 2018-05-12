@@ -2,24 +2,40 @@
 package file
 
 import (
-	"crypto/md5"
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
+	"strings"
+	"time"
 
-	"github.com/micro/go-config/source"
+	"github.com/pijalu/go-config/changeset"
+	"github.com/pijalu/go-config/parser"
+	"github.com/pijalu/go-config/parser/json"
+	"github.com/pijalu/go-config/parser/xml"
+	"github.com/pijalu/go-config/parser/yaml"
+	"github.com/pijalu/go-config/source"
 )
 
 type file struct {
-	path string
-	opts source.Options
+	path    string
+	opts    source.Options
+	modTime time.Time
 }
 
 var (
 	DefaultPath = "config.json"
 )
 
-func (f *file) Read() (*source.ChangeSet, error) {
+var parsers = make(map[string]parser.Parser)
+
+func init() {
+	parsers["json"] = json.NewParser()
+	parsers["yaml"] = yaml.NewParser()
+	parsers["xml"] = xml.NewParser()
+}
+
+func (f *file) Load() (interface{}, error) {
 	fh, err := os.Open(f.path)
 	if err != nil {
 		return nil, err
@@ -33,18 +49,31 @@ func (f *file) Read() (*source.ChangeSet, error) {
 	if err != nil {
 		return nil, err
 	}
+	f.modTime = info.ModTime()
 
-	// hash the file
-	h := md5.New()
-	h.Write(b)
-	checksum := fmt.Sprintf("%x", h.Sum(nil))
+	return b, nil
+}
 
-	return &source.ChangeSet{
-		Source:    f.String(),
-		Timestamp: info.ModTime(),
-		Data:      b,
-		Checksum:  checksum,
-	}, nil
+func (f *file) Read() (*changeset.ChangeSet, error) {
+	data, err := f.Load()
+	if err != nil {
+		return nil, fmt.Errorf("failed to read: %v", err)
+	}
+	ext := strings.ToLower(
+		strings.TrimPrefix(filepath.Ext(f.path), "."))
+	p, present := parsers[ext]
+	if !present {
+		return nil, fmt.Errorf("could not find parser for %s (ext %s)", f.path, ext)
+	}
+
+	cs, err := p.Parse("file/"+ext, data)
+	// Update mod time based on file
+	if err != nil {
+		cs.Timestamp = f.modTime
+		cs.RecalculateChecksum()
+	}
+
+	return cs, err
 }
 
 func (f *file) String() string {

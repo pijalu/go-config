@@ -8,12 +8,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/micro/go-config/source/file"
+	"github.com/pijalu/go-config/source/file"
 )
 
 func createFileForTest(t *testing.T) *os.File {
 	data := []byte(`{"foo": "bar"}`)
-	path := filepath.Join(os.TempDir(), fmt.Sprintf("file.%d", time.Now().UnixNano()))
+	path := filepath.Join(os.TempDir(), fmt.Sprintf("file.%d.json", time.Now().UnixNano()))
 	fh, err := os.Create(path)
 	if err != nil {
 		t.Error(err)

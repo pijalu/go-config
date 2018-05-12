@@ -1,12 +1,11 @@
 package envvar
 
 import (
-	"encoding/json"
 	"os"
 	"testing"
 	"time"
 
-	"github.com/micro/go-config/source"
+	"github.com/pijalu/go-config/source"
 )
 
 func TestEnvvar_Read(t *testing.T) {
@@ -28,11 +27,7 @@ func TestEnvvar_Read(t *testing.T) {
 		t.Error(err)
 	}
 
-	var actual map[string]interface{}
-	if err := json.Unmarshal(c.Data, &actual); err != nil {
-		t.Error(err)
-	}
-
+	actual := c.Data
 	actualDB := actual["database"].(map[string]interface{})
 
 	for k, v := range expected["database"] {
@@ -67,10 +62,7 @@ func TestEnvvar_Prefixes(t *testing.T) {
 			t.Error(err)
 		}
 
-		var actual map[string]interface{}
-		if err := json.Unmarshal(c.Data, &actual); err != nil {
-			t.Error(err)
-		}
+		actual := c.Data
 
 		// assert other prefixes ignored
 		if l := len(actual); l != len(pt.expectedKeys) {

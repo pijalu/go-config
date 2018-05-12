@@ -1,8 +1,8 @@
 package config
 
 import (
-	"github.com/micro/go-config/reader"
-	"github.com/micro/go-config/source"
+	"github.com/pijalu/go-config/reader"
+	"github.com/pijalu/go-config/source"
 )
 
 // WithSource appends a source to list of sources

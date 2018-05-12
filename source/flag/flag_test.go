@@ -1,7 +1,6 @@
 package flag
 
 import (
-	"encoding/json"
 	"flag"
 	"testing"
 )
@@ -20,10 +19,7 @@ func TestFlagsrc_Read(t *testing.T) {
 		t.Error(err)
 	}
 
-	var actual map[string]interface{}
-	if err := json.Unmarshal(c.Data, &actual); err != nil {
-		t.Error(err)
-	}
+	var actual = c.Data
 
 	actualDB := actual["database"].(map[string]interface{})
 	if actualDB["host"] != *dbhost {

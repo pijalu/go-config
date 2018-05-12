@@ -1,7 +1,6 @@
 package config
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"log"
@@ -9,9 +8,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/micro/go-config/reader"
-	"github.com/micro/go-config/reader/json"
-	"github.com/micro/go-config/source"
+	"github.com/pijalu/go-config/changeset"
+	"github.com/pijalu/go-config/reader"
+	"github.com/pijalu/go-config/source"
 )
 
 type config struct {
@@ -20,11 +19,11 @@ type config struct {
 
 	sync.RWMutex
 	// the current merged set
-	set *source.ChangeSet
+	set *changeset.ChangeSet
 	// the current values
 	vals reader.Values
 	// all the sets
-	sets []*source.ChangeSet
+	sets []*changeset.ChangeSet
 	// all the sources
 	sources []source.Source
 
@@ -41,7 +40,7 @@ type watcher struct {
 
 func newConfig(opts ...Option) Config {
 	options := Options{
-		Reader: json.NewReader(),
+		Reader: reader.NewReader(),
 	}
 
 	for _, o := range opts {
@@ -63,7 +62,7 @@ func newConfig(opts ...Option) Config {
 
 func (c *config) watch(idx int, s source.Source) {
 	c.Lock()
-	c.sets = append(c.sets, &source.ChangeSet{Source: s.String()})
+	c.sets = append(c.sets, &changeset.ChangeSet{Source: s.String()})
 	c.Unlock()
 
 	// watches a source for changes
@@ -163,7 +162,7 @@ func (c *config) update() {
 
 // sync loads all the sources, calls the parser and updates the config
 func (c *config) sync() {
-	var sets []*source.ChangeSet
+	var sets []*changeset.ChangeSet
 
 	c.Lock()
 
@@ -246,10 +245,10 @@ func (c *config) Get(path ...string) reader.Value {
 		// Let's try hack this
 		// We should really be better
 		if ch == nil || ch.Data == nil {
-			ch = &source.ChangeSet{
+			ch = &changeset.ChangeSet{
 				Timestamp: time.Now(),
 				Source:    "config",
-				Data:      []byte(`{}`),
+				Data:      map[string]interface{}{},
 			}
 		}
 		v, _ = c.opts.Reader.Values(ch)
@@ -264,21 +263,6 @@ func (c *config) Get(path ...string) reader.Value {
 
 	// ok we're going hardcore now
 	return newValue()
-}
-
-func (c *config) Bytes() []byte {
-	if !c.loaded() {
-		c.sync()
-	}
-
-	c.Lock()
-	defer c.Unlock()
-
-	if c.vals == nil {
-		return []byte{}
-	}
-
-	return c.vals.Bytes()
 }
 
 func (c *config) Load(sources ...source.Source) error {
@@ -345,7 +329,7 @@ func (w *watcher) Next() (reader.Value, error) {
 		case <-w.exit:
 			return nil, errors.New("watcher stopped")
 		case v := <-w.updates:
-			if bytes.Equal(w.value.Bytes(), v.Bytes()) {
+			if w.value.Checksum() == v.Checksum() {
 				continue
 			}
 			w.value = v

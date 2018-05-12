@@ -1,22 +1,31 @@
 package flag
 
 import (
-	"crypto/md5"
-	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/imdario/mergo"
-	"github.com/micro/go-config/source"
 	"strings"
-	"time"
+
+	"github.com/imdario/mergo"
+	"github.com/pijalu/go-config/changeset"
+	"github.com/pijalu/go-config/parser"
+	"github.com/pijalu/go-config/parser/noop"
+	"github.com/pijalu/go-config/source"
 )
+
+const sourceName = "flag"
 
 type flagsrc struct {
 	opts source.Options
 }
 
-func (fs *flagsrc) Read() (*source.ChangeSet, error) {
+var prs parser.Parser
+
+func init() {
+	prs = noop.NewParser()
+}
+
+func (fs *flagsrc) Load() (interface{}, error) {
 	if !flag.Parsed() {
 		return nil, errors.New("flags not parsed")
 	}
@@ -30,7 +39,7 @@ func (fs *flagsrc) Read() (*source.ChangeSet, error) {
 		tmp := make(map[string]interface{})
 		for i, k := range keys {
 			if i == 0 {
-				tmp[k] = f.Value
+				tmp[k] = f.Value.String()
 				continue
 			}
 
@@ -41,21 +50,15 @@ func (fs *flagsrc) Read() (*source.ChangeSet, error) {
 		return
 	})
 
-	b, err := json.Marshal(changes)
+	return changes, nil
+}
+
+func (fs *flagsrc) Read() (*changeset.ChangeSet, error) {
+	data, err := fs.Load()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Failed to read: %v", err)
 	}
-
-	h := md5.New()
-	h.Write(b)
-	checksum := fmt.Sprintf("%x", h.Sum(nil))
-
-	return &source.ChangeSet{
-		Data:      b,
-		Checksum:  checksum,
-		Timestamp: time.Now(),
-		Source:    fs.String(),
-	}, nil
+	return prs.Parse(sourceName, data)
 }
 
 func reverse(ss []string) {
@@ -70,7 +73,7 @@ func (fs *flagsrc) Watch() (source.Watcher, error) {
 }
 
 func (fs *flagsrc) String() string {
-	return "flag"
+	return sourceName
 }
 
 // NewSource returns a config source for integrating parsed flags.

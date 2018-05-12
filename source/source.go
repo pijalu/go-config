@@ -3,27 +3,21 @@ package source
 
 import (
 	"context"
-	"time"
+
+	"github.com/pijalu/go-config/changeset"
 )
 
 // Source is the source from which config is loaded
 type Source interface {
-	Read() (*ChangeSet, error)
+	Load() (interface{}, error)
+	Read() (*changeset.ChangeSet, error)
 	Watch() (Watcher, error)
 	String() string
 }
 
-// ChangeSet represents a set of changes from a source
-type ChangeSet struct {
-	Data      []byte
-	Checksum  string
-	Timestamp time.Time
-	Source    string
-}
-
 // Watcher watches a source for changes
 type Watcher interface {
-	Next() (*ChangeSet, error)
+	Next() (*changeset.ChangeSet, error)
 	Stop() error
 }
 
