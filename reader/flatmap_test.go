@@ -1,6 +1,7 @@
 package reader
 
 import (
+	"reflect"
 	"testing"
 )
 
@@ -20,18 +21,9 @@ func TestFlatMap(t *testing.T) {
 	}
 
 	actual := flatMap(inputMap)
-	if len(expectedMap) != len(actual) {
-		t.Fatalf("Expected %d elems but got %d",
-			len(expectedMap),
-			len(actual))
-	}
-
-	for k, v := range expectedMap {
-		if actual[k] != v {
-			t.Fatalf("expected %v for key %v but got %v",
-				v,
-				k,
-				actual[k])
-		}
+	if !reflect.DeepEqual(expectedMap, actual) {
+		t.Fatalf("Expected %v but  got %v",
+			expectedMap,
+			actual)
 	}
 }

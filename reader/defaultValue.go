@@ -128,7 +128,7 @@ func (v *defaultValue) Float64(def float64) float64 {
 			return def
 		}
 		var err error
-		b, err = strconv.ParseFloat(s, 0)
+		b, err = strconv.ParseFloat(s, 64)
 		if err != nil {
 			return def
 		}
@@ -180,7 +180,7 @@ func (v *defaultValue) StringMap(def map[string]string) map[string]string {
 			r[k] = fmt.Sprintf("%v", v)
 		}
 	}
-	return def
+	return r
 }
 
 // Scan fills a struct with given value
