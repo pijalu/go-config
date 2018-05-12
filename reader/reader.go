@@ -22,6 +22,7 @@ type Values interface {
 
 // Value represents a value of any type
 type Value interface {
+	Checksum() string
 	Bool(def bool) bool
 	Int(def int) int
 	String(def string) string

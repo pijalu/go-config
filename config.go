@@ -11,7 +11,6 @@ import (
 // Config is an interface abstraction for dynamic configuration
 type Config interface {
 	Close() error
-	Bytes() []byte
 	Get(path ...string) reader.Value
 	Load(source ...source.Source) error
 	Watch(path ...string) (Watcher, error)

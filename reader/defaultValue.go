@@ -1,6 +1,8 @@
 package reader
 
 import (
+	"crypto/md5"
+	"encoding/gob"
 	"errors"
 	"fmt"
 	"strconv"
@@ -57,6 +59,14 @@ func asString(v interface{}) (string, bool) {
 		s = b.String()
 	}
 	return s, true
+}
+
+// Checksum returns checksum of the current value
+func (v *defaultValue) Checksum() string {
+	h := md5.New()
+	enc := gob.NewEncoder(h)
+	enc.Encode(v.v)
+	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
 // Bool return boolean value

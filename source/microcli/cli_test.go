@@ -1,10 +1,11 @@
 package microcli
 
 import (
-	"encoding/json"
+	"fmt"
+	"testing"
+
 	"github.com/micro/cli"
 	"github.com/pijalu/go-config/source"
-	"testing"
 )
 
 func TestClisrc_Read(t *testing.T) {
@@ -24,13 +25,11 @@ func TestClisrc_Read(t *testing.T) {
 		t.Error(err)
 	}
 
-	var actual map[string]interface{}
-	if err := json.Unmarshal(c.Data, &actual); err != nil {
-		t.Error(err)
-	}
-
+	actual := c.Data
 	actualDB := actual["db"].(map[string]interface{})
-	if actualDB["host"] != "localhost" {
+	actualValue := actualDB["host"].(fmt.Stringer).String()
+
+	if actualValue != "localhost" {
 		t.Errorf("expected localhost, got %s", actualDB["name"])
 	}
 }
