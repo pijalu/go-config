@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/imdario/mergo"
 	"github.com/micro/go-config/source"
+	"github.com/pijalu/go-config/mapm"
 )
 
 var (
@@ -59,7 +59,8 @@ func (e *envvar) Read() (*source.ChangeSet, error) {
 			tmp = map[string]interface{}{k: tmp}
 		}
 
-		if err := mergo.Map(&changes, tmp); err != nil {
+		var err error
+		if changes, err = mapm.Merge(changes, tmp); err != nil {
 			return nil, err
 		}
 	}

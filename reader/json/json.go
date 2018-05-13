@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/imdario/mergo"
 	"github.com/micro/go-config/reader"
 	"github.com/micro/go-config/source"
 	hash "github.com/mitchellh/hashstructure"
+	"github.com/pijalu/go-config/mapm"
 )
 
 type jsonReader struct{}
@@ -30,7 +30,8 @@ func (j *jsonReader) Parse(changes ...*source.ChangeSet) (*source.ChangeSet, err
 		if err := json.Unmarshal(m.Data, &data); err != nil {
 			return nil, err
 		}
-		if err := mergo.Map(&merged, data, mergo.WithOverride); err != nil {
+		var err error
+		if merged, err = mapm.Merge(merged, data); err != nil {
 			return nil, err
 		}
 	}

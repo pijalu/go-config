@@ -2,9 +2,10 @@ package microcli
 
 import (
 	"encoding/json"
+	"testing"
+
 	"github.com/micro/cli"
 	"github.com/micro/go-config/source"
-	"testing"
 )
 
 func TestClisrc_Read(t *testing.T) {
@@ -27,6 +28,10 @@ func TestClisrc_Read(t *testing.T) {
 	var actual map[string]interface{}
 	if err := json.Unmarshal(c.Data, &actual); err != nil {
 		t.Error(err)
+	}
+
+	if actual["db"] == nil {
+		t.Fatalf("actual does not contains expected keys: %v", actual["name"])
 	}
 
 	actualDB := actual["db"].(map[string]interface{})

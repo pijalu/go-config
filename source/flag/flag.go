@@ -6,10 +6,12 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/imdario/mergo"
-	"github.com/micro/go-config/source"
+	"log"
 	"strings"
 	"time"
+
+	"github.com/micro/go-config/source"
+	"github.com/pijalu/go-config/mapm"
 )
 
 type flagsrc struct {
@@ -37,7 +39,11 @@ func (fs *flagsrc) Read() (*source.ChangeSet, error) {
 			tmp = map[string]interface{}{k: tmp}
 		}
 
-		mergo.Map(&changes, tmp) // need to sort error handling
+		var err error
+		changes, err = mapm.Merge(changes, tmp) // need to sort error handling
+		if err != nil {
+			log.Printf("error during merge: %v", err)
+		}
 		return
 	})
 

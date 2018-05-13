@@ -4,11 +4,14 @@ import (
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
-	"github.com/imdario/mergo"
-	"github.com/micro/cli"
-	"github.com/micro/go-config/source"
+	"log"
+
 	"strings"
 	"time"
+
+	"github.com/micro/cli"
+	"github.com/micro/go-config/source"
+	"github.com/pijalu/go-config/mapm"
 )
 
 type clisrc struct {
@@ -17,16 +20,25 @@ type clisrc struct {
 }
 
 func (c *clisrc) Read() (*source.ChangeSet, error) {
+	var err error
 	var changes map[string]interface{}
 
 	for _, name := range c.ctx.GlobalFlagNames() {
 		tmp := toEntry(name, c.ctx.GlobalGeneric(name))
-		mergo.Map(&changes, tmp) // need to sort error handling
+		changes, err = mapm.Merge(changes, tmp)
+		// need to sort error handling - log some info for now
+		if err != nil {
+			log.Printf("could not merge all entries: %v", err)
+		}
 	}
 
 	for _, name := range c.ctx.FlagNames() {
 		tmp := toEntry(name, c.ctx.Generic(name))
-		mergo.Map(&changes, tmp) // need to sort error handling
+		changes, err = mapm.Merge(changes, tmp)
+		// need to sort error handling - log some info for now
+		if err != nil {
+			log.Printf("could not merge all entries: %v", err)
+		}
 	}
 
 	b, err := json.Marshal(changes)
@@ -70,7 +82,7 @@ func reverse(ss []string) {
 }
 
 func split(r rune) bool {
-    return r == '-' || r == '_'
+	return r == '-' || r == '_'
 }
 
 func (c *clisrc) Watch() (source.Watcher, error) {
