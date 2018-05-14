@@ -7,9 +7,9 @@ import (
 
 	"github.com/clbanning/mxj"
 
-	"github.com/pijalu/go-config/changeset"
 	"github.com/pijalu/go-config/parser"
 	"github.com/pijalu/go-config/parser/noop"
+	"github.com/pijalu/go-config/source"
 )
 
 // Parser object
@@ -44,7 +44,7 @@ func (m *Parser) parseXML(data interface{}) (map[string]interface{}, error) {
 }
 
 // Parse parses data, expected to be []bytes and return a matching changeset
-func (m *Parser) Parse(src string, data interface{}) (*changeset.ChangeSet, error) {
+func (m *Parser) Parse(src string, data interface{}) (*source.ChangeSet, error) {
 	xmlData, err := m.parseXML(data)
 	if err != nil {
 		return nil, err

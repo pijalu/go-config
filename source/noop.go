@@ -2,15 +2,13 @@ package source
 
 import (
 	"errors"
-
-	"github.com/pijalu/go-config/changeset"
 )
 
 type noopWatcher struct {
 	exit chan struct{}
 }
 
-func (w *noopWatcher) Next() (*changeset.ChangeSet, error) {
+func (w *noopWatcher) Next() (*ChangeSet, error) {
 	<-w.exit
 
 	return nil, errors.New("noopWatcher stopped")

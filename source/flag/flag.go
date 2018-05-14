@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/imdario/mergo"
-	"github.com/pijalu/go-config/changeset"
 	"github.com/pijalu/go-config/parser"
 	"github.com/pijalu/go-config/parser/noop"
 	"github.com/pijalu/go-config/source"
@@ -53,7 +52,7 @@ func (fs *flagsrc) Load() (interface{}, error) {
 	return changes, nil
 }
 
-func (fs *flagsrc) Read() (*changeset.ChangeSet, error) {
+func (fs *flagsrc) Read() (*source.ChangeSet, error) {
 	data, err := fs.Load()
 	if err != nil {
 		return nil, fmt.Errorf("Failed to read: %v", err)

@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pijalu/go-config/changeset"
+	"github.com/pijalu/go-config/source"
 )
 
 type structWithStringer struct{}
@@ -17,7 +17,7 @@ func (t structWithStringer) String() string {
 
 func TestMap(t *testing.T) {
 	expected := map[string]interface{}{"key": "value"}
-	actual := NewValues(&changeset.ChangeSet{
+	actual := NewValues(&source.ChangeSet{
 		Data: expected,
 	}).Map()
 
@@ -31,7 +31,7 @@ func TestMap(t *testing.T) {
 func TestGet(t *testing.T) {
 	expected := "value"
 
-	vs := NewValues(&changeset.ChangeSet{
+	vs := NewValues(&source.ChangeSet{
 		Data: map[string]interface{}{
 			"k1": map[string]interface{}{
 				"k2": expected,

@@ -5,7 +5,6 @@ import (
 	"net"
 
 	"github.com/hashicorp/consul/api"
-	"github.com/pijalu/go-config/changeset"
 	"github.com/pijalu/go-config/parser"
 	"github.com/pijalu/go-config/parser/noop"
 	"github.com/pijalu/go-config/source"
@@ -45,7 +44,7 @@ func (c *consul) Load() (interface{}, error) {
 	return makeMap(kv, c.stripPrefix), nil
 }
 
-func (c *consul) Read() (*changeset.ChangeSet, error) {
+func (c *consul) Read() (*source.ChangeSet, error) {
 	data, err := c.Load()
 	if err != nil {
 		return nil, fmt.Errorf("Failed to read: %v", err)

@@ -1,14 +1,14 @@
 package memory
 
-import "github.com/pijalu/go-config/changeset"
+import "github.com/pijalu/go-config/source"
 
 type watcher struct {
 	Id      string
-	Updates chan *changeset.ChangeSet
+	Updates chan *source.ChangeSet
 	Source  *memory
 }
 
-func (w *watcher) Next() (*changeset.ChangeSet, error) {
+func (w *watcher) Next() (*source.ChangeSet, error) {
 	cs := <-w.Updates
 	return cs, nil
 }

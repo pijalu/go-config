@@ -9,11 +9,11 @@ import (
 	"time"
 
 	"github.com/mitchellh/mapstructure"
-	"github.com/pijalu/go-config/changeset"
+	"github.com/pijalu/go-config/source"
 )
 
 type defaultValues struct {
-	cs *changeset.ChangeSet
+	cs *source.ChangeSet
 }
 
 type defaultValue struct {
@@ -21,7 +21,7 @@ type defaultValue struct {
 }
 
 // NewValues builds a new value
-func NewValues(s *changeset.ChangeSet) Values {
+func NewValues(s *source.ChangeSet) Values {
 	return &defaultValues{
 		cs: s,
 	}

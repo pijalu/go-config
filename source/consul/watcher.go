@@ -6,7 +6,6 @@ import (
 
 	"github.com/hashicorp/consul/api"
 	"github.com/hashicorp/consul/watch"
-	"github.com/pijalu/go-config/changeset"
 	"github.com/pijalu/go-config/source"
 )
 
@@ -15,7 +14,7 @@ type watcher struct {
 	stripPrefix string
 
 	wp   *watch.Plan
-	ch   chan *changeset.ChangeSet
+	ch   chan *source.ChangeSet
 	exit chan bool
 }
 
@@ -23,7 +22,7 @@ func newWatcher(key, addr, name string, stripPrefix string) (source.Watcher, err
 	w := &watcher{
 		name:        name,
 		stripPrefix: stripPrefix,
-		ch:          make(chan *changeset.ChangeSet),
+		ch:          make(chan *source.ChangeSet),
 		exit:        make(chan bool),
 	}
 
@@ -60,7 +59,7 @@ func (w *watcher) handle(idx uint64, data interface{}) {
 	w.ch <- cs
 }
 
-func (w *watcher) Next() (*changeset.ChangeSet, error) {
+func (w *watcher) Next() (*source.ChangeSet, error) {
 	select {
 	case cs := <-w.ch:
 		return cs, nil

@@ -3,7 +3,6 @@ package envvar
 import (
 	"errors"
 
-	"github.com/pijalu/go-config/changeset"
 	"github.com/pijalu/go-config/source"
 )
 
@@ -11,7 +10,7 @@ type watcher struct {
 	exit chan struct{}
 }
 
-func (w *watcher) Next() (*changeset.ChangeSet, error) {
+func (w *watcher) Next() (*source.ChangeSet, error) {
 	<-w.exit
 
 	return nil, errors.New("watcher stopped")

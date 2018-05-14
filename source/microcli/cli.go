@@ -6,7 +6,6 @@ import (
 
 	"github.com/imdario/mergo"
 	"github.com/micro/cli"
-	"github.com/pijalu/go-config/changeset"
 	"github.com/pijalu/go-config/parser"
 	"github.com/pijalu/go-config/parser/noop"
 	"github.com/pijalu/go-config/source"
@@ -40,7 +39,7 @@ func (c *clisrc) Load() (interface{}, error) {
 	return changes, nil
 }
 
-func (c *clisrc) Read() (*changeset.ChangeSet, error) {
+func (c *clisrc) Read() (*source.ChangeSet, error) {
 	data, err := c.Load()
 	if err != nil {
 		return nil, fmt.Errorf("Failed to read: %v", err)
@@ -71,7 +70,7 @@ func reverse(ss []string) {
 }
 
 func split(r rune) bool {
-    return r == '-' || r == '_'
+	return r == '-' || r == '_'
 }
 
 func (c *clisrc) Watch() (source.Watcher, error) {

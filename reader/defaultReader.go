@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pijalu/go-config/changeset"
+	"github.com/pijalu/go-config/source"
 	"github.com/pijalu/mergo"
 )
 
@@ -24,7 +24,7 @@ func (d *defaultReader) String() string {
 }
 
 // Parse load and merge a series of ChangeSet
-func (d *defaultReader) Parse(changeSets ...*changeset.ChangeSet) (*changeset.ChangeSet, error) {
+func (d *defaultReader) Parse(changeSets ...*source.ChangeSet) (*source.ChangeSet, error) {
 	if len(changeSets) == 0 {
 		return nil, nil
 	}
@@ -40,7 +40,7 @@ func (d *defaultReader) Parse(changeSets ...*changeset.ChangeSet) (*changeset.Ch
 	}
 
 	// Return merged change set
-	return (&changeset.ChangeSet{
+	return (&source.ChangeSet{
 		Timestamp: time.Now(),
 		Data:      merged,
 		Source:    strings.Join(sources, ";"),
@@ -48,7 +48,7 @@ func (d *defaultReader) Parse(changeSets ...*changeset.ChangeSet) (*changeset.Ch
 }
 
 // Values returns value from changeset
-func (d *defaultReader) Values(c *changeset.ChangeSet) (Values, error) {
+func (d *defaultReader) Values(c *source.ChangeSet) (Values, error) {
 	if c == nil {
 		return nil, errors.New("changeset is nil")
 	}

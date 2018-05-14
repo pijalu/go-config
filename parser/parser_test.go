@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/pijalu/go-config/changeset"
+	"github.com/pijalu/go-config/source"
 )
 
 func TestReset(t *testing.T) {
@@ -48,7 +48,7 @@ func TestParse(t *testing.T) {
 	Reset()
 	parser := &MockParser{
 		RError:     nil,
-		RChangeSet: &changeset.ChangeSet{Source: "test"},
+		RChangeSet: &source.ChangeSet{Source: "test"},
 	}
 	Add("test", parser)
 

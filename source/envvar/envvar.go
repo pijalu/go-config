@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/imdario/mergo"
-	"github.com/pijalu/go-config/changeset"
 	"github.com/pijalu/go-config/parser"
 	"github.com/pijalu/go-config/parser/noop"
 	"github.com/pijalu/go-config/source"
@@ -74,7 +73,7 @@ func (e *envvar) Load() (interface{}, error) {
 	return changes, nil
 }
 
-func (e *envvar) Read() (*changeset.ChangeSet, error) {
+func (e *envvar) Read() (*source.ChangeSet, error) {
 	data, err := e.Load()
 	if err != nil {
 		return nil, fmt.Errorf("Failed to read: %v", err)

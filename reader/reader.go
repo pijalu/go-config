@@ -4,13 +4,13 @@ package reader
 import (
 	"time"
 
-	"github.com/pijalu/go-config/changeset"
+	"github.com/pijalu/go-config/source"
 )
 
 // Reader is an interface for merging changesets
 type Reader interface {
-	Parse(...*changeset.ChangeSet) (*changeset.ChangeSet, error)
-	Values(*changeset.ChangeSet) (Values, error)
+	Parse(...*source.ChangeSet) (*source.ChangeSet, error)
+	Values(*source.ChangeSet) (Values, error)
 	String() string
 }
 

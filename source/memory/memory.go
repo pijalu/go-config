@@ -6,13 +6,12 @@ import (
 	"time"
 
 	"github.com/pborman/uuid"
-	"github.com/pijalu/go-config/changeset"
 	"github.com/pijalu/go-config/source"
 )
 
 type memory struct {
 	sync.RWMutex
-	ChangeSet *changeset.ChangeSet
+	ChangeSet *source.ChangeSet
 	Watchers  map[string]*watcher
 }
 
@@ -20,9 +19,9 @@ func (s *memory) Load() (interface{}, error) {
 	return s.ChangeSet.Data, nil
 }
 
-func (s *memory) Read() (*changeset.ChangeSet, error) {
+func (s *memory) Read() (*source.ChangeSet, error) {
 	s.RLock()
-	cs := &changeset.ChangeSet{
+	cs := &source.ChangeSet{
 		Timestamp: s.ChangeSet.Timestamp,
 		Data:      s.ChangeSet.Data,
 		Checksum:  s.ChangeSet.Checksum,
@@ -35,7 +34,7 @@ func (s *memory) Read() (*changeset.ChangeSet, error) {
 func (s *memory) Watch() (source.Watcher, error) {
 	w := &watcher{
 		Id:      uuid.NewUUID().String(),
-		Updates: make(chan *changeset.ChangeSet, 100),
+		Updates: make(chan *source.ChangeSet, 100),
 		Source:  s,
 	}
 
@@ -49,7 +48,7 @@ func (s *memory) Watch() (source.Watcher, error) {
 func (s *memory) Update(data map[string]interface{}) {
 	s.Lock()
 	// update changeset
-	s.ChangeSet = (&changeset.ChangeSet{
+	s.ChangeSet = (&source.ChangeSet{
 		Timestamp: time.Now(),
 		Data:      data,
 		Source:    "memory",

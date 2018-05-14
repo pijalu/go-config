@@ -4,13 +4,13 @@ package parser
 import (
 	"fmt"
 
-	"github.com/pijalu/go-config/changeset"
+	"github.com/pijalu/go-config/source"
 )
 
 // Parser defines a basic parser
 type Parser interface {
 	// Parse parses a given data into a changeset. It returns error in case of error
-	Parse(source string, data interface{}) (*changeset.ChangeSet, error)
+	Parse(source string, data interface{}) (*source.ChangeSet, error)
 }
 
 // parsers is the map of configured parsers
@@ -38,7 +38,7 @@ func Reset() {
 }
 
 // Parse parses a given source data
-func Parse(source string, data interface{}) (*changeset.ChangeSet, error) {
+func Parse(source string, data interface{}) (*source.ChangeSet, error) {
 	parser, ok := parsers[source]
 	if !ok {
 		return nil, fmt.Errorf("no parser configured for %s", source)

@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/pijalu/go-config/changeset"
 	"github.com/pijalu/go-config/parser"
 	"github.com/pijalu/go-config/parser/noop"
+	"github.com/pijalu/go-config/source"
 
 	"gopkg.in/yaml.v2"
 )
@@ -76,7 +76,7 @@ func (m *Parser) parseYAML(data interface{}) (map[string]interface{}, error) {
 }
 
 // Parse parses data, expected to be []bytes and return a matching changeset
-func (m *Parser) Parse(src string, data interface{}) (*changeset.ChangeSet, error) {
+func (m *Parser) Parse(src string, data interface{}) (*source.ChangeSet, error) {
 	yamlData, err := m.parseYAML(data)
 	if err != nil {
 		return nil, err

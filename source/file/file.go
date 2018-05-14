@@ -9,7 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pijalu/go-config/changeset"
 	"github.com/pijalu/go-config/parser"
 	"github.com/pijalu/go-config/parser/json"
 	"github.com/pijalu/go-config/parser/xml"
@@ -54,7 +53,7 @@ func (f *file) Load() (interface{}, error) {
 	return b, nil
 }
 
-func (f *file) Read() (*changeset.ChangeSet, error) {
+func (f *file) Read() (*source.ChangeSet, error) {
 	data, err := f.Load()
 	if err != nil {
 		return nil, fmt.Errorf("failed to read: %v", err)
